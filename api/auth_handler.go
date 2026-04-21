@@ -45,6 +45,8 @@ func LoginHandler(c *gin.Context) {
 	// 验证用户名和密码
 	storedPassword, exists := config.AppConfig.AuthUsers[req.Username]
 	if !exists || storedPassword != req.Password {
+		// Add a small delay on failed login to slow down brute-force attempts
+		time.Sleep(500 * time.Millisecond)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "用户名或密码错误"})
 		return
 	}

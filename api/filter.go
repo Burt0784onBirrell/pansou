@@ -112,29 +112,27 @@ func filterResults(results []model.SearchResult, includeKeywords, excludeKeyword
 }
 
 // matchFilter 检查文本是否匹配过滤条件
+// 规则：exclude 优先于 include；若文本包含任意 exclude 关键词则排除，
+// 若设置了 include 则文本必须包含至少一个 include 关键词才保留。
 func matchFilter(text string, includeKeywords, excludeKeywords []string) bool {
 	lowerText := strings.ToLower(text)
-	
-	// 检查 exclude（任一匹配则排除）
+
+	// 先检查排除关键词（优先级更高）
 	for _, kw := range excludeKeywords {
 		if strings.Contains(lowerText, kw) {
 			return false
 		}
 	}
-	
-	// 检查 include（如果有 include 列表，必须至少匹配一个）
+
+	// 再检查包含关键词
 	if len(includeKeywords) > 0 {
-		matched := false
 		for _, kw := range includeKeywords {
 			if strings.Contains(lowerText, kw) {
-				matched = true
-				break
+				return true
 			}
 		}
-		if !matched {
-			return false
-		}
+		return false
 	}
-	
+
 	return true
 }
